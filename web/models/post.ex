@@ -34,7 +34,9 @@ defmodule BirdBlog.Post do
   defp generate_slug(changeset) do
     case fetch_field(changeset, :slug) do
       {:changes, nil} ->
-        changeset = put_change(changeset, :slug, title_to_slug(fetch_field(changeset, :title)))
+        changeset = put_change(changeset,
+                               :slug,
+                               title_to_slug(fetch_field(changeset, :title)))
       _ ->
         changeset
      end

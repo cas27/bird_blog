@@ -1,5 +1,6 @@
 defmodule BirdBlog.Post do
   use BirdBlog.Web, :model
+  alias BirdBlog.Repo
 
   before_insert :generate_slug
 
@@ -23,20 +24,30 @@ defmodule BirdBlog.Post do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+    |> validate_unique(:slug, on: Repo)
   end
 
-  def title_to_slug({_, title}) do
+  def title_to_slug(title) do
     title
     |> String.downcase
     |> String.replace(" ", "-")
   end
 
+  def unique_slug({_, title}) do
+    title = title_to_slug(title)
+    exists = Repo.get_by(BirdBlog.Post, slug: title)
+    if exists do
+      unique_slug({:error, "#{title}-#{:random.uniform(99999)}"})
+    else
+      title
+    end
+  end
+
   defp generate_slug(changeset) do
     case fetch_field(changeset, :slug) do
       {:changes, nil} ->
-        changeset = put_change(changeset,
-                               :slug,
-                               title_to_slug(fetch_field(changeset, :title)))
+        slug = unique_slug(fetch_field(changeset, :title))
+        changeset = put_change(changeset, :slug, slug)
       _ ->
         changeset
      end

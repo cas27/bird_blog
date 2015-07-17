@@ -2,7 +2,7 @@ defmodule BirdBlog.PostControllerTest do
   use BirdBlog.ConnCase
 
   alias BirdBlog.Post
-  @valid_attrs %{body: "some content", title: "some content"}
+  @valid_attrs %{body: "some content", title: "some content", slug: "some-content"}
   @invalid_attrs %{}
 
   setup do
@@ -32,8 +32,8 @@ defmodule BirdBlog.PostControllerTest do
   end
 
   test "shows chosen resource", %{conn: conn} do
-    post = Repo.insert! %Post{}
-    conn = get conn, post_path(conn, :show, post)
+    post = Repo.insert! %Post{title: "Sup", slug: "sup"}
+    conn = get conn, post_path(conn, :show, post.slug)
     assert html_response(conn, 200) =~ "Show post"
   end
 
@@ -44,26 +44,26 @@ defmodule BirdBlog.PostControllerTest do
   end
 
   test "renders form for editing chosen resource", %{conn: conn} do
-    post = Repo.insert! %Post{}
+    post = Repo.insert! %Post{title: "Sup", slug: "sup"}
     conn = get conn, post_path(conn, :edit, post)
     assert html_response(conn, 200) =~ "Edit post"
   end
 
   test "updates chosen resource and redirects when data is valid", %{conn: conn} do
-    post = Repo.insert! %Post{}
+    post = Repo.insert! %Post{title: "Sup", slug: "sup"}
     conn = put conn, post_path(conn, :update, post), post: @valid_attrs
     assert redirected_to(conn) == post_path(conn, :index)
     assert Repo.get_by(Post, @valid_attrs)
   end
 
   test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
-    post = Repo.insert! %Post{}
+    post = Repo.insert! %Post{title: "Sup", slug: "sup"}
     conn = put conn, post_path(conn, :update, post), post: @invalid_attrs
     assert html_response(conn, 200) =~ "Edit post"
   end
 
   test "deletes chosen resource", %{conn: conn} do
-    post = Repo.insert! %Post{}
+    post = Repo.insert! %Post{title: "Sup", slug: "sup"}
     conn = delete conn, post_path(conn, :delete, post)
     assert redirected_to(conn) == post_path(conn, :index)
     refute Repo.get(Post, post.id)
